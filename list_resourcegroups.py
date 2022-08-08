@@ -20,8 +20,12 @@ group_list = resource_client.resource_groups.list()
 # Show the groups in formatted output
 column_width = 40
 
+print('')
 print("Resource Group".ljust(column_width) + "Location")
 print("-" * (column_width * 2))
 
 for group in list(group_list):
     print(f"{group.name:<{column_width}}{group.location}")
+
+print("=" * (column_width * 2))
+print('')
