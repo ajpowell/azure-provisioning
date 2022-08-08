@@ -12,7 +12,7 @@ credential = AzureCliCredential()
 subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
 
 # Retrieve the resource group to use, defaulting to "myResourceGroup".
-resource_group = os.getenv("RESOURCE_GROUP_NAME", "PythonAzureExample-VM-rg")
+resource_group = os.getenv("RESOURCE_GROUP_NAME", "test-cluster-rg")
 
 # Obtain the management object for resources.
 resource_client = ResourceManagementClient(credential, subscription_id)
