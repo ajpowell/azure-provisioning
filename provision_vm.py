@@ -14,21 +14,28 @@ import os
 
 # Constants we need in multiple places: the resource group name and the region
 # in which we provision resources. You can change these values however you want.
-RESOURCE_GROUP_NAME = "PythonAzureExample-VM-rg"
+PREFIX = 'test-cluster'
+
+RESOURCE_GROUP_NAME = PREFIX + "-rg"
 LOCATION = "uksouth"
 
 # VM ID
-ID = '03'
+ID = '00'
+
+public_ip = True
+# public_ip = False
+
+
 
 # Network and IP address names
-VNET_NAME = "python-example-vnet"
-SUBNET_NAME = "python-example-subnet"
-IP_NAME = "python-example-ip_" + ID
-IP_CONFIG_NAME = "python-example-ip-config_" + ID
-NIC_NAME = "python-example-nic_" + ID
-NSG_NAME = "python-example-nsg_" + ID
+VNET_NAME = PREFIX + "-vnet"
+SUBNET_NAME = PREFIX + "-subnet"
+IP_NAME = PREFIX + "-ip-" + ID
+IP_CONFIG_NAME = PREFIX + "-ip-config-" + ID
+NIC_NAME = PREFIX + "-nic-" + ID
+NSG_NAME = PREFIX + "-nsg-" + ID
 
-VM_NAME = "ExampleVM" + ID
+VM_NAME = "node" + ID
 USERNAME = "azureuser"
 # PASSWORD = "ChangePa$$w0rd24"  # Using privatekey
 
@@ -126,57 +133,79 @@ except:
     ip_address_result = poller.result()
     print(f" 4. Provisioned public IP address {ip_address_result.name} with address {ip_address_result.ip_address}")
 
-# Step 5: Provision the network security group
-PORT_RULE_NAME = 'Allow port 22'
+if public_ip:
+    # Step 5: Provision the network security group
+    PORT_RULE_NAME = 'Allow port 22'
 
-try:
-    nsg_result = network_client.network_security_groups.get(RESOURCE_GROUP_NAME, NSG_NAME)
-    print(f" 5. Existing network security group {nsg_result.name} found.")
+    try:
+        nsg_result = network_client.network_security_groups.get(RESOURCE_GROUP_NAME, NSG_NAME)
+        print(f" 5. Existing network security group {nsg_result.name} found.")
 
-except:
-    nsg_params = NetworkSecurityGroup(
-        id= NSG_NAME, 
-        location=LOCATION, 
-        tags={ "name" : NSG_NAME },
-        security_rules=[{
-            "protocol": 'Tcp', 
-            "source_address_prefix": '*', 
-            "destination_address_prefix": '*', 
-            "access": 'Allow', 
-            "direction": 'Inbound', 
-            "description": PORT_RULE_NAME,
-            "source_port_range": '*', 
-            "destination_port_range": '22', 
-            "priority": 100, 
-            "name": PORT_RULE_NAME
-            }]
+    except:
+        nsg_params = NetworkSecurityGroup(
+            id= NSG_NAME, 
+            location=LOCATION, 
+            tags={ "name" : NSG_NAME },
+            security_rules=[{
+                "protocol": 'Tcp', 
+                "source_address_prefix": '*', 
+                "destination_address_prefix": '*', 
+                "access": 'Allow', 
+                "direction": 'Inbound', 
+                "description": PORT_RULE_NAME,
+                "source_port_range": '*', 
+                "destination_port_range": '22', 
+                "priority": 100, 
+                "name": PORT_RULE_NAME
+                }]
+            )
+        poller = network_client.network_security_groups.begin_create_or_update(RESOURCE_GROUP_NAME, NSG_NAME, parameters=nsg_params)
+        nsg_result = poller.result()
+        print(f" 5. Provisioned network security group {nsg_result.name}")
+
+    # Step 6: Provision the network interface client
+    try:
+        nic_result = network_client.network_interfaces.get(RESOURCE_GROUP_NAME, NIC_NAME)
+        print(f" 6. Existing network interface client {nic_result.name} found")
+
+    except:
+        poller = network_client.network_interfaces.begin_create_or_update(RESOURCE_GROUP_NAME,
+            NIC_NAME, 
+            {
+                "location": LOCATION,
+                "ip_configurations": [ {
+                    "name": IP_CONFIG_NAME,
+                    "subnet": { "id": subnet_result.id },
+                    "public_ip_address": {"id": ip_address_result.id }
+                }],
+            'network_security_group': {
+                'id': nsg_result.id
+            }
+            }
         )
-    poller = network_client.network_security_groups.begin_create_or_update(RESOURCE_GROUP_NAME, NSG_NAME, parameters=nsg_params)
-    nsg_result = poller.result()
-    print(f" 5. Provisioned network security group {nsg_result.name}")
+        nic_result = poller.result()
+        print(f" 6. Provisioned network interface client {nic_result.name} (Internet accessible)")
 
-# Step 6: Provision the network interface client
-try:
-    nic_result = network_client.network_interfaces.get(RESOURCE_GROUP_NAME, NIC_NAME)
-    print(f" 6. Existing network interface client {nic_result.name} found")
+else:
+    # Step 6: Provision the network interface client
+    try:
+        nic_result = network_client.network_interfaces.get(RESOURCE_GROUP_NAME, NIC_NAME)
+        print(f" 6. Existing network interface client {nic_result.name} found")
 
-except:
-    poller = network_client.network_interfaces.begin_create_or_update(RESOURCE_GROUP_NAME,
-        NIC_NAME, 
-        {
-            "location": LOCATION,
-            "ip_configurations": [ {
-                "name": IP_CONFIG_NAME,
-                "subnet": { "id": subnet_result.id },
-                "public_ip_address": {"id": ip_address_result.id }
-            }],
-        'network_security_group': {
-            'id': nsg_result.id
-        }
-        }
-    )
-    nic_result = poller.result()
-    print(f" 6. Provisioned network interface client {nic_result.name}")
+    except:
+        poller = network_client.network_interfaces.begin_create_or_update(RESOURCE_GROUP_NAME,
+            NIC_NAME, 
+            {
+                "location": LOCATION,
+                "ip_configurations": [ {
+                    "name": IP_CONFIG_NAME,
+                    "subnet": { "id": subnet_result.id },
+                    "public_ip_address": {"id": ip_address_result.id }
+                }]
+            }
+        )
+        nic_result = poller.result()
+        print(f" 6. Provisioned network interface client {nic_result.name} (private)")
 
 
 
