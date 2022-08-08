@@ -15,8 +15,13 @@ Windows     `.\venv\Scripts\Activate.ps1`
 ## Requirements.txt
 Full details here: https://datagy.io/python-requirements-txt/
 
+Once venv is activated...
+
+Update pip to latest version:
+`python -m pip install --upgrade pip`
+
 Install required modules using:
-`pip3 install -r requirements.txt`
+`pip install -r requirements.txt`
 
 ---
 ## Markdown Cheat Sheet
