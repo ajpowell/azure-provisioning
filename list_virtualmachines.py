@@ -27,7 +27,7 @@ column_width = 36
 
 print('')
 print("Resource".ljust(column_width) + "Type".ljust(column_width)
-      + "Create date".ljust(column_width) # + "Change date".ljust(column_width)
+      + "Create date".ljust(column_width)  # + "Change date".ljust(column_width)
       )
 print("-" * (column_width * 3))
 
@@ -35,7 +35,7 @@ for resource in list(resource_list):
     if resource.type == 'Microsoft.Compute/virtualMachines':
         print(f"{resource.name:<{column_width}}{resource.type:<{column_width}}"
           f"{str(resource.created_time):<{column_width}}")
-          # f"{str(resource.created_time):<{column_width}}{str(resource.changed_time):<{column_width}}")
+#  f"{str(resource.created_time):<{column_width}}{str(resource.changed_time):<{column_width}}")
 
 print("=" * (column_width * 3))
 print('')

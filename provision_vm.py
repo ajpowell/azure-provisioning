@@ -10,7 +10,7 @@ from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.network.v2020_06_01.models import NetworkSecurityGroup
 # from azure.mgmt.network.v2020_06_01.models import SecurityRule
 import os
-import sys
+# import sys
 
 # Constants we need in multiple places: the resource group name and the region
 # in which we provision resources. You can change these values however you want.
@@ -118,16 +118,16 @@ except:
         IP_NAME,
         {
             "location": LOCATION,
-            "sku": { "name": "Standard" },
+            "sku": {"name": "Standard"},
             "public_ip_allocation_method": "Static",
-            "public_ip_address_version" : "IPV4"
+            "public_ip_address_version": "IPV4"
         }
     )
     ip_address_result = poller.result()
     print(f" 4. Provisioned public IP address {ip_address_result.name} with address {ip_address_result.ip_address}")
 
 # Step 5: Provision the network security group
-PORT_RULE_NAME='Allow port 22'
+PORT_RULE_NAME = 'Allow port 22'
 
 try:
     nsg_result = network_client.network_security_groups.get(RESOURCE_GROUP_NAME, NSG_NAME)
