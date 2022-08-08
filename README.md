@@ -23,6 +23,16 @@ Update pip to latest version:
 Install required modules using:
 `pip install -r requirements.txt`
 
+## Azure cli
+Full details here: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-macos
+
+Mac install azure-cli:
+`brew update && brew install azure-cli`
+
+## Misc
+Store the subscription ID in an environment variable:
+`export AZURE_SUBSCRIPTION_ID='xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'`
+
 ---
 ## Markdown Cheat Sheet
 
