@@ -26,7 +26,7 @@ resource_list = resource_client.resources.list_by_resource_group(
 column_width = 36
 
 print("Resource".ljust(column_width) + "Type".ljust(column_width)
-    + "Create date".ljust(column_width) + "Change date".ljust(column_width))
+      + "Create date".ljust(column_width) + "Change date".ljust(column_width))
 print("-" * (column_width * 4))
 
 for resource in list(resource_list):
