@@ -20,7 +20,7 @@ RESOURCE_GROUP_NAME = PREFIX + "-rg"
 LOCATION = "uksouth"
 
 # VM ID
-ID = '01'
+ID = '02'
 
 # public_ip = True
 public_ip = False
